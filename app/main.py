@@ -1,11 +1,13 @@
 from fastapi import FastAPI
-from app.api import auth, devices
+from app.api import login, devices
 
-app = FastAPI(title="SDET Mock Enterprise API")
+app = FastAPI(
+    title="FastAPI Mock Enterprise App",
+    docs_url="/docs",
+    redoc_url=None,
+    openapi_url="/openapi.json",
+)
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
-
-app.include_router(auth.router, prefix="/api")
-app.include_router(devices.router, prefix="/api")
+# Include routers
+app.include_router(login.router)
+app.include_router(devices.router)
