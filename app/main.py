@@ -1,3 +1,6 @@
+import time
+import uuid
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
@@ -33,14 +36,24 @@ def health_check():
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
+
+    request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
+    request.state.request_id = request_id
+
+    start_time = time.time()
+
     response = await call_next(request)
 
-    logger.info(
-        "Incoming request",
-        extra={
-            "path": request.url.path,
-            "method": request.method,
-        },
-    )
+    process_time = time.time() - start_time
+
+    logger.info({
+        "request_id": request_id,
+        "method": request.method,
+        "path": request.url.path,
+        "status_code": response.status_code,
+        "process_time": process_time,
+    })
+
+    response.headers["X-Request-ID"] = request_id
 
     return response
