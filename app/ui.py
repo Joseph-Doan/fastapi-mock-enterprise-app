@@ -4,12 +4,10 @@ from fastapi.templating import Jinja2Templates
 
 from app.data.store import devices_db
 
-from sut.FastAPIMockApp import app
-
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
-@app.get("/", response_class=HTMLResponse)
+@router.get("/", response_class=HTMLResponse)
 def home():
     return open("index.html").read()
 

@@ -1,9 +1,7 @@
 from fastapi import APIRouter, Header, HTTPException
 from app.models.auth import LoginRequest
 
-from sut.FastAPIMockApp import app
-
-router = APIRouter("/api")
+router = APIRouter()
 
 FAKE_TOKEN = "fake-jwt-token"
 
@@ -20,5 +18,3 @@ def login(payload: LoginRequest):
 def verify_token(authorization: str = Header(None)):
     if authorization != f"Bearer {FAKE_TOKEN}":
         raise HTTPException(status_code=401, detail="Unauthorized")
-
-app.include_router(router)
