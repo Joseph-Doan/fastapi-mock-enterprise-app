@@ -5,9 +5,9 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 
-from app.api import auth, devices
-from app.ui import router as ui_router
-from app.core.logging_config import setup_logging
+from api import auth, devices
+from ui import router as ui_router
+from core.logging_config import setup_logging
 
 app = FastAPI(
     title="FastAPI Mock Enterprise App",
