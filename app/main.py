@@ -5,9 +5,9 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 
-from api import auth, devices
-from ui import router as ui_router
-from core.logging_config import setup_logging
+from app.api import auth, devices
+from app.ui import router as ui_router
+from app.core.logging_config import setup_logging
 
 app = FastAPI(
     title="FastAPI Mock Enterprise App",
@@ -23,7 +23,7 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(devices.router, prefix="/api")
 app.include_router(ui_router)
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+#app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 @app.get("/health", tags=["Health"])
 def health_check():

@@ -1,65 +1,60 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List
 from pydantic import BaseModel
-from app.core.security import get_current_user
+from app.api.auth import verify_token
 
 router = APIRouter()
 
-# ----- Models -----
 class Device(BaseModel):
     id: int
     name: str
-    status: str  # online/offline
+    status: str
 
 class DeviceCreate(BaseModel):
     name: str
     status: str
 
 class DeviceUpdate(BaseModel):
-    name: str = None
-    status: str = None
+    name: str | None = None
+    status: str | None = None
 
-# ----- In-Memory Storage -----
-mock_devices: List[Device] = [
-    Device(id=1, name="Smart Sensor", status="online"),
-    Device(id=2, name="Edge Gateway", status="offline"),
+DEVICES = [
+    {"id": 1, "name": "Router-01", "status": "online"},
+    {"id": 2, "name": "Switch-01", "status": "offline"},
 ]
 
-# ----- CRUD Endpoints -----
+@router.get("/devices", response_model=list[Device], tags=["Devices"])
+def get_devices(_: str = Depends(verify_token)):
+    return DEVICES
 
-@router.get("/devices", response_model=List[Device])
-def get_devices(user: str = Depends(get_current_user)):
-    return mock_devices
+@router.post("/devices", response_model=Device, status_code=status.HTTP_201_CREATED, tags=["Devices"])
+def create_device(payload: DeviceCreate, _: str = Depends(verify_token)):
+    new_id = max([d["id"] for d in DEVICES], default=0) + 1
+    device = {"id": new_id, "name": payload.name, "status": payload.status}
+    DEVICES.append(device)
+    return device
 
-@router.get("/devices/{device_id}", response_model=Device)
-def get_device(device_id: int, user: str = Depends(get_current_user)):
-    for device in mock_devices:
-        if device.id == device_id:
-            return device
+@router.get("/devices/{device_id}", response_model=Device, tags=["Devices"])
+def get_device(device_id: int, _: str = Depends(verify_token)):
+    for d in DEVICES:
+        if d["id"] == device_id:
+            return d
     raise HTTPException(status_code=404, detail="Device not found")
 
-@router.post("/devices", response_model=Device, status_code=status.HTTP_201_CREATED)
-def create_device(device: DeviceCreate, user: str = Depends(get_current_user)):
-    new_id = max([d.id for d in mock_devices], default=0) + 1
-    new_device = Device(id=new_id, name=device.name, status=device.status)
-    mock_devices.append(new_device)
-    return new_device
-
-@router.put("/devices/{device_id}", response_model=Device)
-def update_device(device_id: int, device_update: DeviceUpdate, user: str = Depends(get_current_user)):
-    for device in mock_devices:
-        if device.id == device_id:
-            if device_update.name is not None:
-                device.name = device_update.name
-            if device_update.status is not None:
-                device.status = device_update.status
-            return device
+@router.put("/devices/{device_id}", response_model=Device, tags=["Devices"])
+def update_device(device_id: int, payload: DeviceUpdate, _: str = Depends(verify_token)):
+    for d in DEVICES:
+        if d["id"] == device_id:
+            if payload.name is not None:
+                d["name"] = payload.name
+            if payload.status is not None:
+                d["status"] = payload.status
+            return d
     raise HTTPException(status_code=404, detail="Device not found")
 
-@router.delete("/devices/{device_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_device(device_id: int, user: str = Depends(get_current_user)):
-    for i, device in enumerate(mock_devices):
-        if device.id == device_id:
-            mock_devices.pop(i)
+@router.delete("/devices/{device_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Devices"])
+def delete_device(device_id: int, _: str = Depends(verify_token)):
+    for i, d in enumerate(DEVICES):
+        if d["id"] == device_id:
+            DEVICES.pop(i)
             return
     raise HTTPException(status_code=404, detail="Device not found")

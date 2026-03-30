@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Header, HTTPException
-from models.auth import LoginRequest
+from app.models.auth import LoginRequest
 
 router = APIRouter()
 
@@ -13,7 +13,6 @@ def login(payload: LoginRequest):
             "token_type": "bearer"
         }
     raise HTTPException(status_code=401, detail="Invalid credentials")
-
 
 def verify_token(authorization: str = Header(None)):
     if authorization != f"Bearer {FAKE_TOKEN}":

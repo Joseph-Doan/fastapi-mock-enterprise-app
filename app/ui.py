@@ -1,32 +1,36 @@
-from fastapi import APIRouter, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
-
-from app.data.store import devices_db
+from fastapi import APIRouter
+from fastapi.responses import HTMLResponse
 
 router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/", response_class=HTMLResponse)
-def home():
-    return open("index.html").read()
-
-
-@router.get("/", response_class=HTMLResponse)
-def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
-
+def login_page():
+    return """
+    <html>
+      <body>
+        <h1>Login</h1>
+        <form method="post" action="/login">
+          <input name="username" type="text" />
+          <input name="password" type="password" />
+          <button type="submit">Login</button>
+        </form>
+      </body>
+    </html>
+    """
 
 @router.post("/login")
-def login(username: str = Form(...), password: str = Form(...)):
+def login(username: str, password: str):
     if username == "admin" and password == "password":
-        return RedirectResponse(url="/devices", status_code=302)
-    return RedirectResponse(url="/", status_code=302)
-
+        return {"message": "ok"}
+    return {"message": "invalid"}
 
 @router.get("/devices", response_class=HTMLResponse)
-def devices_page(request: Request):
-    return templates.TemplateResponse(
-        "devices.html",
-        {"request": request, "devices": devices_db},
-    )
+def devices_page():
+    return """
+    <html>
+      <body>
+        <h1>Devices</h1>
+        <ul><li>Router-01</li><li>Switch-01</li></ul>
+      </body>
+    </html>
+    """
