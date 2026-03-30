@@ -3,7 +3,7 @@ from typing import List
 from pydantic import BaseModel
 from app.core.security import get_current_user
 
-router = APIRouter(prefix="/api", tags=["Devices"])
+router = APIRouter()
 
 # ----- Models -----
 class Device(BaseModel):
