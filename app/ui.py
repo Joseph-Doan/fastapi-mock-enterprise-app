@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
+from fastapi.responses import RedirectResponse
 
 router = APIRouter()
 
@@ -34,3 +35,10 @@ def devices_page():
       </body>
     </html>
     """
+
+@router.post("/login")
+async def login_submit(...):
+    # after verifying login success
+    response = RedirectResponse(url="/devices", status_code=303)
+    response.set_cookie(key="token", value="fake-jwt-token")
+    return response
