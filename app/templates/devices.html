@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Devices</h2>
+
+<ul>
+    {% for device in devices %}
+        <li>
+            {{ device.id }} - {{ device.name }} ({{ device.status }})
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
