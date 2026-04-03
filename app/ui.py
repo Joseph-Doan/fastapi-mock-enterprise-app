@@ -37,7 +37,7 @@ def devices_page():
     """
 
 @router.post("/login")
-async def login_submit(...):
+async def login_submit():
     # after verifying login success
     response = RedirectResponse(url="/devices", status_code=303)
     response.set_cookie(key="token", value="fake-jwt-token")
