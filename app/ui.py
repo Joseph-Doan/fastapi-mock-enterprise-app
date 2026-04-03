@@ -1,7 +1,5 @@
-from Tools.scripts.patchcheck import status
-from fastapi import APIRouter
-from fastapi.responses import HTMLResponse
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 router = APIRouter()
 
@@ -21,7 +19,7 @@ def login_page():
     """
 
 @router.post("/login")
-def login(username: str, password: str):
+def login(username: str = Form(...), password: str = Form(...)):
     if username == "admin" and password == "password":
         response = RedirectResponse(url="/devices", status_code=303)
         response.set_cookie(key="token", value="fake-jwt-token")
