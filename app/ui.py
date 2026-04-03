@@ -1,3 +1,4 @@
+from Tools.scripts.patchcheck import status
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 from fastapi.responses import RedirectResponse
@@ -22,23 +23,13 @@ def login_page():
 @router.post("/login")
 def login(username: str, password: str):
     if username == "admin" and password == "password":
-        return {"message": "ok"}
-    return {"message": "invalid"}
+        response = RedirectResponse(url="/devices", status_code=303)
+        response.set_cookie(key="token", value="fake-jwt-token")
+        return response
+    return HTMLResponse("<h1>Login Failed</h1>", status_code=401)
 
 @router.get("/devices", response_class=HTMLResponse)
 def devices_page():
-    return """
-    <html>
-      <body>
+    return HTMLResponse("""
         <h1>Devices</h1>
-        <ul><li>Router-01</li><li>Switch-01</li></ul>
-      </body>
-    </html>
-    """
-
-@router.post("/login")
-async def login_submit():
-    # after verifying login success
-    response = RedirectResponse(url="/devices", status_code=303)
-    response.set_cookie(key="token", value="fake-jwt-token")
-    return response
+    """)
